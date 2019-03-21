@@ -1,0 +1,4 @@
+{
+  "db": "mongodb://localhost/vidly",
+  "port": "3001"
+}
