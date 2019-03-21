@@ -9,15 +9,15 @@ class App extends Component {
   async componentDidMount() {
     const { data } = await getCustomers()
     this.setState({
-      customers: data
+      customers: data,
     })
   }
 
   render() {
-    const customers = this.state.customers.map((c) => {
+    const customers = this.state.customers.map(c => {
       return <li key={c._id}>{c.name}</li>
     })
-    
+
     return (
       <div>
         <p>{customers}</p>

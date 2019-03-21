@@ -5,7 +5,7 @@ const app = express()
 require('./startup/db.js')()
 require('./startup/routes.js')(app)
 
-const port = process.env.PORT || config.get("port")
+const port = process.env.PORT || config.get('port')
 const server = app.listen(port, () =>
   console.log(`Listening on port ${port}...`)
 )

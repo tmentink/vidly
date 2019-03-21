@@ -4,30 +4,30 @@ const config = require('config')
 
 const data = [
   {
-    "name": "Marta Benson",
-    "phone": "(804) 426-3085",
-    "isGold": true
+    name: 'Marta Benson',
+    phone: '(804) 426-3085',
+    isGold: true,
   },
   {
-    "name": "Travis Guerrero",
-    "phone": "(947) 418-2949",
-    "isGold": false
+    name: 'Travis Guerrero',
+    phone: '(947) 418-2949',
+    isGold: false,
   },
   {
-    "name": "Brady Hanson",
-    "phone": "(969) 544-2395",
-    "isGold": false
+    name: 'Brady Hanson',
+    phone: '(969) 544-2395',
+    isGold: false,
   },
   {
-    "name": "Katheryn Solis",
-    "phone": "(974) 489-3148",
-    "isGold": true
+    name: 'Katheryn Solis',
+    phone: '(974) 489-3148',
+    isGold: true,
   },
   {
-    "name": "Eliza Mason",
-    "phone": "(808) 545-2622",
-    "isGold": false
-  }
+    name: 'Eliza Mason',
+    phone: '(808) 545-2622',
+    isGold: false,
+  },
 ]
 
 async function seed() {
