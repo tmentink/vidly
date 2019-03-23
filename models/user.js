@@ -23,12 +23,17 @@ const schema = new mongoose.Schema({
     minlength: 10,
     maxlength: 1024,
   },
+  isAdmin: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 schema.methods.generateAuthToken = function() {
   return jwt.sign(
     {
       _id: this._id,
+      isAdmin: this.isAdmin,
     },
     config.get('jwtPrivateKey')
   )
@@ -51,6 +56,7 @@ function validate(user) {
       .required()
       .min(10)
       .max(255),
+    isAdmin: Joi.boolean(),
   })
 }
 
