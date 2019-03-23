@@ -2,6 +2,7 @@ const config = require('config')
 const express = require('express')
 const app = express()
 
+require('./startup/config.js')()
 require('./startup/db.js')()
 require('./startup/routes.js')(app)
 require('./startup/validation.js')()
