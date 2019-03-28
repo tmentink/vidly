@@ -4,6 +4,7 @@ const { Movie } = require('../models/movie')
 const { Rental, validate } = require('../models/rental')
 const mongoose = require('mongoose')
 const Fawn = require('fawn')
+const validateObjectId = require('../middleware/validateObjectId')
 const express = require('express')
 const router = express.Router()
 
@@ -54,7 +55,7 @@ router.post('/', auth, async (req, res) => {
   res.send(rental)
 })
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', validateObjectId, async (req, res) => {
   const rental = await Rental.findById(req.params.id)
 
   if (!rental)
