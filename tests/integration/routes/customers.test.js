@@ -10,10 +10,18 @@ const customers = [
   { name: 'name1', phone: '111-111-1111', isGold: false },
 ]
 let server
+let token
+let name
+let phone
+let isGold
 
 describe(baseUrl, () => {
   beforeEach(() => {
     server = require('../../../server')
+    token = new User({ isAdmin: true }).generateAuthToken()
+    name = customers[0].name
+    phone = customers[0].phone
+    isGold = customers[0].isGold
   })
 
   afterEach(async () => {
@@ -66,24 +74,12 @@ describe(baseUrl, () => {
   })
 
   describe('POST /', () => {
-    let token
-    let name
-    let phone
-    let isGold
-
     const exec = async () => {
       return await request(server)
         .post(baseUrl)
         .set('x-auth-token', token)
         .send({ name, phone, isGold })
     }
-
-    beforeEach(() => {
-      token = new User().generateAuthToken()
-      name = customers[0].name
-      phone = customers[0].phone
-      isGold = customers[0].isGold
-    })
 
     it('should return 401 if client is not logged in', async () => {
       token = ''
@@ -94,7 +90,7 @@ describe(baseUrl, () => {
     })
 
     it('should return 400 if name is missing', async () => {
-      name = undefined
+      name = ''
 
       const res = await exec()
 
@@ -118,7 +114,7 @@ describe(baseUrl, () => {
     })
 
     it('should return 400 if phone is missing', async () => {
-      phone = undefined
+      phone = ''
 
       const res = await exec()
 
@@ -160,10 +156,6 @@ describe(baseUrl, () => {
   })
 
   describe('PUT /:id', () => {
-    let token
-    let newName
-    let newPhone
-    let newIsGold
     let customer
     let id
 
@@ -171,18 +163,17 @@ describe(baseUrl, () => {
       return await request(server)
         .put(`${baseUrl}/${id}`)
         .set('x-auth-token', token)
-        .send({ name: newName, phone: newPhone, isGold: newIsGold })
+        .send({ name, phone, isGold })
     }
 
     beforeEach(async () => {
       customer = new Customer(customers[0])
       await customer.save()
 
-      token = new User().generateAuthToken()
       id = customer._id
-      newName = 'updatedName'
-      newPhone = '222-222-2222'
-      newIsGold = false
+      name = 'updatedName'
+      phone = '222-222-2222'
+      isGold = false
     })
 
     it('should return 401 if client is not logged in', async () => {
@@ -194,7 +185,7 @@ describe(baseUrl, () => {
     })
 
     it('should return 400 if name is missing', async () => {
-      newName = undefined
+      name = ''
 
       const res = await exec()
 
@@ -202,7 +193,7 @@ describe(baseUrl, () => {
     })
 
     it('should return 400 if name is less than 5 characters', async () => {
-      newName = 'a'
+      name = 'a'
 
       const res = await exec()
 
@@ -210,7 +201,7 @@ describe(baseUrl, () => {
     })
 
     it('should return 400 if name is more than 50 characters', async () => {
-      newName = new Array(52).join('a')
+      name = new Array(52).join('a')
 
       const res = await exec()
 
@@ -218,7 +209,7 @@ describe(baseUrl, () => {
     })
 
     it('should return 400 if phone is missing', async () => {
-      newPhone = undefined
+      phone = ''
 
       const res = await exec()
 
@@ -226,7 +217,7 @@ describe(baseUrl, () => {
     })
 
     it('should return 400 if phone is less than 10 characters', async () => {
-      newPhone = '1'
+      phone = '1'
 
       const res = await exec()
 
@@ -234,7 +225,7 @@ describe(baseUrl, () => {
     })
 
     it('should return 400 if phone is more than 20 characters', async () => {
-      newPhone = new Array(22).join('1')
+      phone = new Array(22).join('1')
 
       const res = await exec()
 
@@ -262,21 +253,20 @@ describe(baseUrl, () => {
 
       const updatedcustomer = await Customer.findById(customer._id)
 
-      expect(updatedcustomer.name).toBe(newName)
+      expect(updatedcustomer.name).toBe(name)
     })
 
     it('should return the updated customer if it is valid', async () => {
       const res = await exec()
 
       expect(res.body).toHaveProperty('_id')
-      expect(res.body).toHaveProperty('name', newName)
-      expect(res.body).toHaveProperty('phone', newPhone)
-      expect(res.body).toHaveProperty('isGold', newIsGold)
+      expect(res.body).toHaveProperty('name', name)
+      expect(res.body).toHaveProperty('phone', phone)
+      expect(res.body).toHaveProperty('isGold', isGold)
     })
   })
 
   describe('DELETE /:id', () => {
-    let token
     let customer
     let id
 
@@ -292,7 +282,6 @@ describe(baseUrl, () => {
       await customer.save()
 
       id = customer._id
-      token = new User({ isAdmin: true }).generateAuthToken()
     })
 
     it('should return 401 if client is not logged in', async () => {

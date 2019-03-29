@@ -7,10 +7,14 @@ const mongoose = require('mongoose')
 const baseUrl = '/api/genres'
 const genres = [{ name: 'name1' }, { name: 'name2' }]
 let server
+let token
+let name
 
 describe(baseUrl, () => {
   beforeEach(() => {
     server = require('../../../server')
+    token = new User({ isAdmin: true }).generateAuthToken()
+    name = genres[0].name
   })
 
   afterEach(async () => {
@@ -59,20 +63,12 @@ describe(baseUrl, () => {
   })
 
   describe('POST /', () => {
-    let token
-    let name
-
     const exec = async () => {
       return await request(server)
         .post(baseUrl)
         .set('x-auth-token', token)
         .send({ name })
     }
-
-    beforeEach(() => {
-      token = new User().generateAuthToken()
-      name = genres[0].name
-    })
 
     it('should return 401 if client is not logged in', async () => {
       token = ''
@@ -83,7 +79,7 @@ describe(baseUrl, () => {
     })
 
     it('should return 400 if name is missing', async () => {
-      name = undefined
+      name = ''
 
       const res = await exec()
 
@@ -123,8 +119,6 @@ describe(baseUrl, () => {
   })
 
   describe('PUT /:id', () => {
-    let token
-    let newName
     let genre
     let id
 
@@ -132,16 +126,15 @@ describe(baseUrl, () => {
       return await request(server)
         .put(`${baseUrl}/${id}`)
         .set('x-auth-token', token)
-        .send({ name: newName })
+        .send({ name })
     }
 
     beforeEach(async () => {
       genre = new Genre(genres[0])
       await genre.save()
 
-      token = new User().generateAuthToken()
       id = genre._id
-      newName = 'updatedName'
+      name = 'updatedName'
     })
 
     it('should return 401 if client is not logged in', async () => {
@@ -153,7 +146,7 @@ describe(baseUrl, () => {
     })
 
     it('should return 400 if name is missing', async () => {
-      newName = undefined
+      name = ''
 
       const res = await exec()
 
@@ -161,7 +154,7 @@ describe(baseUrl, () => {
     })
 
     it('should return 400 if name is less than 5 characters', async () => {
-      newName = 'a'
+      name = 'a'
 
       const res = await exec()
 
@@ -169,7 +162,7 @@ describe(baseUrl, () => {
     })
 
     it('should return 400 if name is more than 50 characters', async () => {
-      newName = new Array(52).join('a')
+      name = new Array(52).join('a')
 
       const res = await exec()
 
@@ -197,19 +190,18 @@ describe(baseUrl, () => {
 
       const updatedGenre = await Genre.findById(genre._id)
 
-      expect(updatedGenre.name).toBe(newName)
+      expect(updatedGenre.name).toBe(name)
     })
 
     it('should return the updated genre if it is valid', async () => {
       const res = await exec()
 
       expect(res.body).toHaveProperty('_id')
-      expect(res.body).toHaveProperty('name', newName)
+      expect(res.body).toHaveProperty('name', name)
     })
   })
 
   describe('DELETE /:id', () => {
-    let token
     let genre
     let id
 
@@ -225,7 +217,6 @@ describe(baseUrl, () => {
       await genre.save()
 
       id = genre._id
-      token = new User({ isAdmin: true }).generateAuthToken()
     })
 
     it('should return 401 if client is not logged in', async () => {
