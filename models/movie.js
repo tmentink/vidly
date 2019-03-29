@@ -36,14 +36,16 @@ function validate(movie) {
     title: Joi.string()
       .required()
       .min(5)
-      .max(50),
+      .max(255),
     genreId: Joi.objectId().required(),
     numberInStock: Joi.number()
       .required()
-      .min(0),
+      .min(0)
+      .max(255),
     dailyRentalRate: Joi.number()
       .required()
-      .min(0),
+      .min(0)
+      .max(255),
   })
 }
 

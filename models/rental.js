@@ -12,15 +12,15 @@ const Rental = mongoose.model(
           minlength: 5,
           maxlength: 50,
         },
-        isGold: {
-          type: Boolean,
-          default: false,
-        },
         phone: {
           type: String,
           required: true,
-          minlength: 5,
-          maxlength: 50,
+          minlength: 10,
+          maxlength: 20,
+        },
+        isGold: {
+          type: Boolean,
+          default: false,
         },
       }),
       required: true,
