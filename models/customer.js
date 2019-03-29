@@ -13,8 +13,8 @@ const Customer = mongoose.model(
     phone: {
       type: String,
       required: true,
-      minlength: 5,
-      maxlength: 50,
+      minlength: 10,
+      maxlength: 20,
     },
     isGold: {
       type: Boolean,
@@ -31,8 +31,8 @@ function validate(customer) {
       .max(50),
     phone: Joi.string()
       .required()
-      .min(5)
-      .max(50),
+      .min(10)
+      .max(20),
     isGold: Joi.boolean(),
   })
 }
