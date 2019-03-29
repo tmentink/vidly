@@ -32,7 +32,9 @@ describe(baseUrl, () => {
       expect(res.body.length).toBe(genres.length)
 
       genres.forEach(genre => {
-        expect(res.body.some(g => g.name === genre.name)).toBeTruthy()
+        const g = res.body.find(x => x.name === genre.name)
+
+        expect(g).toHaveProperty('name', genre.name)
       })
     })
   })

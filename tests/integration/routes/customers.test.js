@@ -7,7 +7,7 @@ const mongoose = require('mongoose')
 const baseUrl = '/api/customers'
 const customers = [
   { name: 'name1', phone: '999-999-9999', isGold: true },
-  { name: 'name1', phone: '111-111-1111', isGold: false },
+  { name: 'name2', phone: '111-111-1111', isGold: false },
 ]
 let server
 let token
@@ -39,9 +39,11 @@ describe(baseUrl, () => {
       expect(res.body.length).toBe(customers.length)
 
       customers.forEach(customer => {
-        expect(res.body.some(c => c.name === customer.name)).toBeTruthy()
-        expect(res.body.some(c => c.phone === customer.phone)).toBeTruthy()
-        expect(res.body.some(c => c.isGold === customer.isGold)).toBeTruthy()
+        const c = res.body.find(x => x.name === customer.name)
+
+        expect(c).toHaveProperty('name', customer.name)
+        expect(c).toHaveProperty('phone', customer.phone)
+        expect(c).toHaveProperty('isGold', customer.isGold)
       })
     })
   })
