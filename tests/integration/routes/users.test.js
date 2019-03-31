@@ -1,4 +1,3 @@
-/* eslint-disable no-return-await */
 const request = require('supertest')
 const { User } = require('../../../models/user')
 
@@ -33,7 +32,7 @@ describe(baseUrl, () => {
 
   describe('POST /', () => {
     const exec = async () => {
-      return await request(server)
+      return request(server)
         .post(baseUrl)
         .send({ name, email, password, isAdmin })
     }

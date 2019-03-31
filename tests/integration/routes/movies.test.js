@@ -1,4 +1,3 @@
-/* eslint-disable no-return-await */
 const request = require('supertest')
 const { Genre } = require('../../../models/genre')
 const { Movie } = require('../../../models/movie')
@@ -107,7 +106,7 @@ describe(baseUrl, () => {
 
   describe('POST /', () => {
     const exec = async () => {
-      return await request(server)
+      return request(server)
         .post(baseUrl)
         .set('x-auth-token', token)
         .send({ title, genreId, numberInStock, dailyRentalRate })
@@ -236,7 +235,7 @@ describe(baseUrl, () => {
     let id
 
     const exec = async () => {
-      return await request(server)
+      return request(server)
         .put(`${baseUrl}/${id}`)
         .set('x-auth-token', token)
         .send({ title, genreId, numberInStock, dailyRentalRate })
@@ -389,7 +388,7 @@ describe(baseUrl, () => {
     let id
 
     const exec = async () => {
-      return await request(server)
+      return request(server)
         .delete(`/api/movies/${id}`)
         .set('x-auth-token', token)
         .send()

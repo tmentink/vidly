@@ -1,4 +1,3 @@
-/* eslint-disable no-return-await */
 const request = require('supertest')
 const { Genre } = require('../../../models/genre')
 const { User } = require('../../../models/user')
@@ -66,7 +65,7 @@ describe(baseUrl, () => {
 
   describe('POST /', () => {
     const exec = async () => {
-      return await request(server)
+      return request(server)
         .post(baseUrl)
         .set('x-auth-token', token)
         .send({ name })
@@ -125,7 +124,7 @@ describe(baseUrl, () => {
     let id
 
     const exec = async () => {
-      return await request(server)
+      return request(server)
         .put(`${baseUrl}/${id}`)
         .set('x-auth-token', token)
         .send({ name })
@@ -208,7 +207,7 @@ describe(baseUrl, () => {
     let id
 
     const exec = async () => {
-      return await request(server)
+      return request(server)
         .delete(`/api/genres/${id}`)
         .set('x-auth-token', token)
         .send()

@@ -1,4 +1,3 @@
-/* eslint-disable no-return-await */
 const request = require('supertest')
 const { Genre } = require('../../../models/genre')
 const { User } = require('../../../models/user')
@@ -18,7 +17,7 @@ describe('auth middleware', () => {
   })
 
   const exec = async () => {
-    return await request(server)
+    return request(server)
       .post('/api/genres')
       .set('x-auth-token', token)
       .send({ name: 'name1' })
