@@ -4,7 +4,8 @@ const { Movie } = require('../models/movie')
 const { Rental, validate } = require('../models/rental')
 const mongoose = require('mongoose')
 const Fawn = require('fawn')
-const validateObjectId = require('../middleware/validateObjectId')
+const valId = require('../middleware/validateObjectId')
+const valReq = require('../middleware/validateRequest')
 const express = require('express')
 const router = express.Router()
 
@@ -15,7 +16,7 @@ router.get('/', async (req, res) => {
   res.send(rentals)
 })
 
-router.get('/:id', validateObjectId, async (req, res) => {
+router.get('/:id', valId, async (req, res) => {
   const rental = await Rental.findById(req.params.id)
 
   if (!rental)
@@ -24,10 +25,7 @@ router.get('/:id', validateObjectId, async (req, res) => {
   res.send(rental)
 })
 
-router.post('/', auth, async (req, res) => {
-  const { error } = validate(req.body)
-  if (error) return res.status(400).send(error.details[0].message)
-
+router.post('/', [auth, valReq(validate)], async (req, res) => {
   const customer = await Customer.findById(req.body.customerId)
   if (!customer) return res.status(400).send('Invalid customer.')
 
