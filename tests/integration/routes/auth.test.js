@@ -1,36 +1,23 @@
 const config = require('config')
 const jwt = require('jsonwebtoken')
 const request = require('supertest')
+const { users } = require('../../data')
 const { User } = require('../../../models/user')
 
 const baseUrl = '/api/auth'
-const users = [
-  {
-    name: 'name1',
-    email: 'email1@test.com',
-    password: 'password11',
-    isAdmin: true,
-  },
-]
+const user = users[0]
 
 let server
-let userId
 let email
 let password
-let isAdmin
 
 describe(baseUrl, () => {
   beforeEach(async () => {
     server = require('../../../server')
-    const user = users[0]
-    const res = await request(server)
-      .post('/api/users')
-      .send(user)
+    await User.collection.insertOne(user)
 
-    userId = res.body._id
     email = user.email
-    password = user.password
-    isAdmin = user.isAdmin
+    password = user.plainPassword
   })
 
   afterEach(async () => {
@@ -88,8 +75,8 @@ describe(baseUrl, () => {
       const token = res.text
       const decoded = jwt.verify(token, config.get('jwtPrivateKey'))
 
-      expect(decoded).toHaveProperty('_id', userId)
-      expect(decoded).toHaveProperty('isAdmin', isAdmin)
+      expect(decoded).toHaveProperty('_id', user._id.toHexString())
+      expect(decoded).toHaveProperty('isAdmin', user.isAdmin)
     })
   })
 })

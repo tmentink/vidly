@@ -1,53 +1,33 @@
+const mongoose = require('mongoose')
 const request = require('supertest')
+const { genres, movies } = require('../../data')
 const { Genre } = require('../../../models/genre')
 const { Movie } = require('../../../models/movie')
 const { User } = require('../../../models/user')
-const mongoose = require('mongoose')
 
 const baseUrl = '/api/movies'
-const movies = [
-  {
-    title: 'movie1',
-    genre: { name: 'name1' },
-    numberInStock: 1,
-    dailyRentalRate: 1,
-  },
-  {
-    title: 'movie2',
-    genre: { name: 'name2' },
-    numberInStock: 1,
-    dailyRentalRate: 1,
-  },
-]
+const movie = movies[0]
+
 let server
 let token
+let id
 let title
+let genre
 let genreId
 let numberInStock
 let dailyRentalRate
 
-const setupData = async () => {
-  const genres = movies.map(m => {
-    return { name: m.genre.name }
-  })
-  await Genre.collection.insertMany(genres)
-
-  for (let i = 0, i_end = movies.length; i < i_end; i++) {
-    const genre = await Genre.findOne({ name: genres[i].name })
-    movies[i].genre._id = genre._id.toString()
-  }
-
-  token = new User({ isAdmin: true }).generateAuthToken()
-  title = movies[0].title
-  genreId = movies[0].genre._id
-  numberInStock = movies[0].numberInStock
-  dailyRentalRate = movies[0].dailyRentalRate
-}
-
 describe(baseUrl, () => {
   beforeEach(async () => {
     server = require('../../../server')
-    await setupData()
+    token = new User({ isAdmin: true }).generateAuthToken()
+
+    id = movie._id
+    title = movie.title
+    genre = movie.genre
+    genreId = movie.genre._id
+    numberInStock = movie.numberInStock
+    dailyRentalRate = movie.dailyRentalRate
   })
 
   afterEach(async () => {
@@ -68,8 +48,10 @@ describe(baseUrl, () => {
       movies.forEach(movie => {
         const m = res.body.find(x => x.title === movie.title)
 
+        expect(m).toHaveProperty('_id', movie._id.toHexString())
         expect(m).toHaveProperty('title', movie.title)
-        expect(m).toHaveProperty('genre')
+        expect(m).toHaveProperty('genre._id', movie.genre._id.toHexString())
+        expect(m).toHaveProperty('genre.name', movie.genre.name)
         expect(m).toHaveProperty('numberInStock', movie.numberInStock)
         expect(m).toHaveProperty('dailyRentalRate', movie.dailyRentalRate)
       })
@@ -77,19 +59,6 @@ describe(baseUrl, () => {
   })
 
   describe('GET /:id', () => {
-    it('should return a movie if valid id is passed', async () => {
-      const movie = new Movie(movies[0])
-      await movie.save()
-
-      const res = await request(server).get(`${baseUrl}/${movie._id}`)
-
-      expect(res.status).toBe(200)
-      expect(res.body).toHaveProperty('title', movie.title)
-      expect(res.body).toHaveProperty('genre')
-      expect(res.body).toHaveProperty('numberInStock', movie.numberInStock)
-      expect(res.body).toHaveProperty('dailyRentalRate', movie.dailyRentalRate)
-    })
-
     it('should return 404 if invalid id is passed', async () => {
       const res = await request(server).get(`${baseUrl}/1`)
 
@@ -102,6 +71,20 @@ describe(baseUrl, () => {
 
       expect(res.status).toBe(404)
     })
+
+    it('should return a movie if valid id is passed', async () => {
+      Movie.collection.insertMany(movies)
+
+      const res = await request(server).get(`${baseUrl}/${id}`)
+
+      expect(res.status).toBe(200)
+      expect(res.body).toHaveProperty('_id', id.toHexString())
+      expect(res.body).toHaveProperty('title', title)
+      expect(res.body).toHaveProperty('genre._id', genreId.toHexString())
+      expect(res.body).toHaveProperty('genre.name', genre.name)
+      expect(res.body).toHaveProperty('numberInStock', numberInStock)
+      expect(res.body).toHaveProperty('dailyRentalRate', dailyRentalRate)
+    })
   })
 
   describe('POST /', () => {
@@ -111,6 +94,10 @@ describe(baseUrl, () => {
         .set('x-auth-token', token)
         .send({ title, genreId, numberInStock, dailyRentalRate })
     }
+
+    beforeEach(async () => {
+      await Genre.collection.insertMany(genres)
+    })
 
     it('should return 401 if client is not logged in', async () => {
       token = ''
@@ -211,29 +198,24 @@ describe(baseUrl, () => {
     it('should save the movie if it is valid', async () => {
       await exec()
 
-      const movie = await Movie.find({ title: movies[0].title })
+      const m = await Movie.find({ title })
 
-      expect(movie).not.toBeNull()
+      expect(m).not.toBeNull()
     })
 
     it('should return the movie if it is valid', async () => {
       const res = await exec()
 
       expect(res.body).toHaveProperty('_id')
-      expect(res.body).toHaveProperty('title', movies[0].title)
-      expect(res.body).toHaveProperty('genre', movies[0].genre)
-      expect(res.body).toHaveProperty('numberInStock', movies[0].numberInStock)
-      expect(res.body).toHaveProperty(
-        'dailyRentalRate',
-        movies[0].dailyRentalRate
-      )
+      expect(res.body).toHaveProperty('title', title)
+      expect(res.body).toHaveProperty('genre._id', genreId.toHexString())
+      expect(res.body).toHaveProperty('genre.name', genre.name)
+      expect(res.body).toHaveProperty('numberInStock', numberInStock)
+      expect(res.body).toHaveProperty('dailyRentalRate', dailyRentalRate)
     })
   })
 
   describe('PUT /:id', () => {
-    let movie
-    let id
-
     const exec = async () => {
       return request(server)
         .put(`${baseUrl}/${id}`)
@@ -242,12 +224,12 @@ describe(baseUrl, () => {
     }
 
     beforeEach(async () => {
-      movie = new Movie(movies[0])
-      await movie.save()
+      await Genre.collection.insertMany(genres)
+      await Movie.collection.insertMany(movies)
 
-      id = movie._id
       title = 'updatedTitle'
-      genreId = movies[1].genre._id
+      genre = movies[1].genre
+      genreId = genre._id
       numberInStock = 2
       dailyRentalRate = 2
     })
@@ -367,7 +349,7 @@ describe(baseUrl, () => {
     it('should update the movie if input is valid', async () => {
       await exec()
 
-      const updatedMovie = await Movie.findById(movie._id)
+      const updatedMovie = await Movie.findById(id)
 
       expect(updatedMovie.title).toBe(title)
     })
@@ -375,18 +357,16 @@ describe(baseUrl, () => {
     it('should return the updated movie if it is valid', async () => {
       const res = await exec()
 
-      expect(res.body).toHaveProperty('_id')
+      expect(res.body).toHaveProperty('_id', id.toHexString())
       expect(res.body).toHaveProperty('title', title)
-      expect(res.body).toHaveProperty('genre')
+      expect(res.body).toHaveProperty('genre._id', genreId.toHexString())
+      expect(res.body).toHaveProperty('genre.name', genre.name)
       expect(res.body).toHaveProperty('numberInStock', numberInStock)
       expect(res.body).toHaveProperty('dailyRentalRate', dailyRentalRate)
     })
   })
 
   describe('DELETE /:id', () => {
-    let movie
-    let id
-
     const exec = async () => {
       return request(server)
         .delete(`/api/movies/${id}`)
@@ -395,10 +375,8 @@ describe(baseUrl, () => {
     }
 
     beforeEach(async () => {
-      movie = new Movie(movies[0])
-      await movie.save()
-
-      id = movie._id
+      await Genre.collection.insertMany(genres)
+      await Movie.collection.insertMany(movies)
     })
 
     it('should return 401 if client is not logged in', async () => {
@@ -444,11 +422,12 @@ describe(baseUrl, () => {
     it('should return the removed movie', async () => {
       const res = await exec()
 
-      expect(res.body).toHaveProperty('_id', movie._id.toHexString())
-      expect(res.body).toHaveProperty('title', movie.title)
-      expect(res.body).toHaveProperty('genre')
-      expect(res.body).toHaveProperty('numberInStock', movie.numberInStock)
-      expect(res.body).toHaveProperty('dailyRentalRate', movie.dailyRentalRate)
+      expect(res.body).toHaveProperty('_id', id.toHexString())
+      expect(res.body).toHaveProperty('title', title)
+      expect(res.body).toHaveProperty('genre._id', genreId.toHexString())
+      expect(res.body).toHaveProperty('genre.name', genre.name)
+      expect(res.body).toHaveProperty('numberInStock', numberInStock)
+      expect(res.body).toHaveProperty('dailyRentalRate', dailyRentalRate)
     })
   })
 })

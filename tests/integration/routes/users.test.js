@@ -1,15 +1,10 @@
 const request = require('supertest')
+const { users } = require('../../data')
 const { User } = require('../../../models/user')
 
 const baseUrl = '/api/users'
-const users = [
-  {
-    name: 'name1',
-    email: 'email1@test.com',
-    password: 'password11',
-    isAdmin: true,
-  },
-]
+const user = users[0]
+
 let server
 let name
 let email
@@ -19,10 +14,11 @@ let isAdmin
 describe(baseUrl, () => {
   beforeEach(() => {
     server = require('../../../server')
-    name = users[0].name
-    email = users[0].email
-    password = users[0].password
-    isAdmin = users[0].isAdmin
+
+    name = user.name
+    email = user.email
+    password = user.plainPassword
+    isAdmin = user.isAdmin
   })
 
   afterEach(async () => {
@@ -112,17 +108,17 @@ describe(baseUrl, () => {
     it('should save the user if it is valid', async () => {
       await exec()
 
-      const user = await User.find({ name: users[0].name })
+      const u = await User.find({ name })
 
-      expect(user).not.toBeNull()
+      expect(u).not.toBeNull()
     })
 
     it('should return the user if it is valid', async () => {
       const res = await exec()
 
       expect(res.body).toHaveProperty('_id')
-      expect(res.body).toHaveProperty('name', users[0].name)
-      expect(res.body).toHaveProperty('email', users[0].email)
+      expect(res.body).toHaveProperty('name', name)
+      expect(res.body).toHaveProperty('email', email)
     })
 
     it('should return 400 if the user is already registered', async () => {
