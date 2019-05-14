@@ -1,33 +1,46 @@
 import React, { Component } from 'react'
 import Like from './common/Like'
+import ListGroup from './common/ListGroup'
 import Pagination from './common/Pagination'
+import { getGenres } from '../services/genreService'
 import { getMovies } from '../services/movieService'
 import { paginate } from '../utils/paginate'
 
 class Movies extends Component {
   state = {
     currentPage: 1,
+    genres: [],
     movies: [],
     pageSize: 4,
+    selectedGenre: null,
   }
 
   async componentDidMount() {
-    const { data } = await getMovies()
+    const { data: genres } = await getGenres()
+    const { data: movies } = await getMovies()
 
     this.setState({
-      movies: data,
+      genres: [{ name: 'All genres', _id: null }, ...genres],
+      movies,
     })
   }
 
   getCountText() {
-    const count = this.state.movies.length
+    const count = this.getFilteredMovies().length
     return count > 0
       ? `Showing ${count} movies in the database`
       : 'There are no movies in the database'
   }
 
+  getFilteredMovies() {
+    const { movies, selectedGenre } = this.state
+    return selectedGenre && selectedGenre._id
+      ? movies.filter(m => m.genre._id === selectedGenre._id)
+      : movies
+  }
+
   getTable() {
-    const count = this.state.movies.length
+    const count = this.getFilteredMovies().length
     if (count === 0) return null
 
     return (
@@ -48,11 +61,9 @@ class Movies extends Component {
   }
 
   getTableRows() {
-    const movies = paginate(
-      this.state.movies,
-      this.state.currentPage,
-      this.state.pageSize
-    )
+    const { currentPage, pageSize } = this.state
+
+    const movies = paginate(this.getFilteredMovies(), currentPage, pageSize)
 
     return movies.map(m => {
       return (
@@ -89,6 +100,10 @@ class Movies extends Component {
     }))
   }
 
+  handleGenreSelect = genre => {
+    this.setState({ currentPage: 1, selectedGenre: genre })
+  }
+
   handleLike = movie => {
     const movies = [...this.state.movies]
     const index = movies.indexOf(movie)
@@ -102,18 +117,29 @@ class Movies extends Component {
   }
 
   render() {
-    const { currentPage, movies, pageSize } = this.state
+    const { currentPage, genres, pageSize, selectedGenre } = this.state
 
     return (
-      <div className="p-4">
-        <p className="mb-3">{this.getCountText()}</p>
-        {this.getTable()}
-        <Pagination
-          currentPage={currentPage}
-          itemsCount={movies.length}
-          onPageChange={this.handlePageChange}
-          pageSize={pageSize}
-        />
+      <div className="container p-4">
+        <div className="row">
+          <div className="col-md-3">
+            <ListGroup
+              items={genres}
+              onItemSelect={this.handleGenreSelect}
+              selectedItem={selectedGenre}
+            />
+          </div>
+          <div className="col-md-9">
+            <p className="mb-3 mt-3 mt-md-0">{this.getCountText()}</p>
+            {this.getTable()}
+            <Pagination
+              currentPage={currentPage}
+              itemsCount={this.getFilteredMovies().length}
+              onPageChange={this.handlePageChange}
+              pageSize={pageSize}
+            />
+          </div>
+        </div>
       </div>
     )
   }
