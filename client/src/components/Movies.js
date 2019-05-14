@@ -1,10 +1,14 @@
 import React, { Component } from 'react'
 import Like from './common/Like'
+import Pagination from './common/Pagination'
 import { getMovies } from '../services/movieService'
+import { paginate } from '../utils/paginate'
 
 class Movies extends Component {
   state = {
+    currentPage: 1,
     movies: [],
+    pageSize: 4,
   }
 
   async componentDidMount() {
@@ -44,7 +48,13 @@ class Movies extends Component {
   }
 
   getTableRows() {
-    return this.state.movies.map(m => {
+    const movies = paginate(
+      this.state.movies,
+      this.state.currentPage,
+      this.state.pageSize
+    )
+
+    return movies.map(m => {
       return (
         <tr key={m._id}>
           <td>{m.title}</td>
@@ -73,13 +83,13 @@ class Movies extends Component {
     })
   }
 
-  handleDeleteMovie(movie, e) {
+  handleDeleteMovie = movie => {
     this.setState(prev => ({
       movies: prev.movies.filter(x => x._id !== movie._id),
     }))
   }
 
-  handleLike(movie, e) {
+  handleLike = movie => {
     const movies = [...this.state.movies]
     const index = movies.indexOf(movie)
     movies[index] = { ...movies[index] }
@@ -87,11 +97,23 @@ class Movies extends Component {
     this.setState({ movies })
   }
 
+  handlePageChange = page => {
+    this.setState({ currentPage: page })
+  }
+
   render() {
+    const { currentPage, movies, pageSize } = this.state
+
     return (
       <div className="p-4">
         <p className="mb-3">{this.getCountText()}</p>
         {this.getTable()}
+        <Pagination
+          currentPage={currentPage}
+          itemsCount={movies.length}
+          onPageChange={this.handlePageChange}
+          pageSize={pageSize}
+        />
       </div>
     )
   }
