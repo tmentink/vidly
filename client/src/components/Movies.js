@@ -79,33 +79,31 @@ class Movies extends Component {
     const movies = paginate(sorted, currentPage, pageSize)
 
     return (
-      <div className="container p-4">
-        <div className="row">
-          <div className="col-md-3">
-            <ListGroup
-              items={genres}
-              onItemSelect={this.handleGenreSelect}
-              selectedItem={selectedGenre}
-            />
-          </div>
-          <div className="col-md-9">
-            <p className="mb-3 mt-3 mt-md-0">
-              Showing {filtered.length} movies in the database
-            </p>
-            <MoviesTable
-              movies={movies}
-              onDelete={this.handleDelete}
-              onLike={this.handleLike}
-              onSort={this.handleSort}
-              sortColumn={sortColumn}
-            />
-            <Pagination
-              currentPage={currentPage}
-              itemsCount={filtered.length}
-              onPageChange={this.handlePageChange}
-              pageSize={pageSize}
-            />
-          </div>
+      <div className="row">
+        <div className="col-md-3">
+          <ListGroup
+            items={genres}
+            onItemSelect={this.handleGenreSelect}
+            selectedItem={selectedGenre}
+          />
+        </div>
+        <div className="col-md-9">
+          <p className="mb-3 mt-3 mt-md-0">
+            Showing {filtered.length} movies in the database
+          </p>
+          <MoviesTable
+            movies={movies}
+            onDelete={this.handleDelete}
+            onLike={this.handleLike}
+            onSort={this.handleSort}
+            sortColumn={sortColumn}
+          />
+          <Pagination
+            currentPage={currentPage}
+            itemsCount={filtered.length}
+            onPageChange={this.handlePageChange}
+            pageSize={pageSize}
+          />
         </div>
       </div>
     )
