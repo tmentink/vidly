@@ -22,13 +22,10 @@ class MoviesTable extends Component {
     {
       key: 'Delete',
       content: movie => (
-        <button
-          type="button"
-          className="btn btn-sm btn-danger"
+        <i
+          className="fa fa-lg fa-times text-danger"
           onClick={() => this.props.onDelete(movie)}
-        >
-          Delete
-        </button>
+        />
       ),
     },
   ]
