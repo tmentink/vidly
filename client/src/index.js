@@ -1,11 +1,14 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { BrowserRouter } from 'react-router-dom'
-import './index.css'
 import App from './components/App'
+import logger from './services/logService'
 import * as serviceWorker from './serviceWorker'
+import './index.css'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'font-awesome/css/font-awesome.css'
+
+logger.init()
 
 ReactDOM.render(
   <BrowserRouter>
