@@ -8,8 +8,8 @@ const schema = new mongoose.Schema({
       name: {
         type: String,
         required: true,
-        minlength: 5,
-        maxlength: 50,
+        minlength: 1,
+        maxlength: 255,
       },
       phone: {
         type: String,
@@ -30,7 +30,7 @@ const schema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true,
-        minlength: 5,
+        minlength: 1,
         maxlength: 255,
       },
       dailyRentalRate: {

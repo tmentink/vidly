@@ -41,16 +41,8 @@ describe(baseUrl, () => {
       expect(res.status).toBe(400)
     })
 
-    it('should return 400 if name is less than 5 characters', async () => {
-      name = 'a'
-
-      const res = await exec()
-
-      expect(res.status).toBe(400)
-    })
-
-    it('should return 400 if name is more than 50 characters', async () => {
-      name = new Array(52).join('a')
+    it('should return 400 if name is more than 255 characters', async () => {
+      name = new Array(257).join('a')
 
       const res = await exec()
 

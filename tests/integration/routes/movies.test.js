@@ -115,14 +115,6 @@ describe(baseUrl, () => {
       expect(res.status).toBe(400)
     })
 
-    it('should return 400 if title is less than 5 characters', async () => {
-      title = 'a'
-
-      const res = await exec()
-
-      expect(res.status).toBe(400)
-    })
-
     it('should return 400 if title is more than 255 characters', async () => {
       title = new Array(257).join('a')
 
@@ -244,14 +236,6 @@ describe(baseUrl, () => {
 
     it('should return 400 if title is missing', async () => {
       title = ''
-
-      const res = await exec()
-
-      expect(res.status).toBe(400)
-    })
-
-    it('should return 400 if title is less than 5 characters', async () => {
-      title = 'a'
 
       const res = await exec()
 
