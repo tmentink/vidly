@@ -1,9 +1,5 @@
 import http from './httpService'
 
-export function createCustomer(customer) {
-  return http.post('/customers', customer)
-}
-
 export function deleteCustomer(id) {
   return http.delete(`/customers/${id}`)
 }
@@ -16,6 +12,14 @@ export function getCustomers() {
   return http.get('/customers')
 }
 
-export function updateCustomer(customer) {
-  return http.put('/customers', customer)
+export function saveCustomer(customer) {
+  const { _id } = customer
+
+  if (_id) {
+    const body = { ...customer }
+    delete body._id
+    return http.put(`/customers/${_id}`, body)
+  }
+
+  return http.post('/customers', customer)
 }

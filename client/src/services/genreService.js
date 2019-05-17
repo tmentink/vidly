@@ -1,9 +1,5 @@
 import http from './httpService'
 
-export function createGenre(genre) {
-  return http.post('/genres', genre)
-}
-
 export function deleteGenre(id) {
   return http.delete(`/genres/${id}`)
 }
@@ -16,6 +12,14 @@ export function getGenres() {
   return http.get('/genres')
 }
 
-export function updateGenre(genre) {
-  return http.put('/genres', genre)
+export function saveGenre(genre) {
+  const { _id } = genre
+
+  if (_id) {
+    const body = { ...genre }
+    delete body._id
+    return http.put(`/genres/${_id}`, body)
+  }
+
+  return http.post('/genres', genre)
 }
