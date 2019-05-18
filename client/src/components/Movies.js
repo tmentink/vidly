@@ -5,7 +5,7 @@ import MoviesTable from './MoviesTable'
 import Pagination from './common/Pagination'
 import SearchBox from './common/SearchBox'
 import { getGenres } from '../services/genreService'
-import { getMovies } from '../services/movieService'
+import { deleteMovie, getMovies } from '../services/movieService'
 import { paginate } from '../utils/paginate'
 import _ from 'lodash'
 
@@ -49,9 +49,24 @@ class Movies extends Component {
   }
 
   handleDelete = movie => {
-    this.setState(prev => ({
-      movies: prev.movies.filter(x => x._id !== movie._id),
-    }))
+    const originalMovies = this.state.movies
+    const movies = originalMovies.filter(x => x._id !== movie._id)
+    this.setState({ movies })
+
+    const messages = {
+      401: 'You are not authorized to delete movies',
+      404: 'The movie has already been deleted',
+    }
+
+    deleteMovie(movie._id).catch(ex => {
+      this.handleErrors({ ex, messages })
+      this.setState({ movies: originalMovies })
+    })
+  }
+
+  handleErrors({ ex, messages }) {
+    const message = messages[ex.response.status]
+    if (message) alert(message)
   }
 
   handleGenreSelect = genre => {
