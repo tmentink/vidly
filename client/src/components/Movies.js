@@ -56,7 +56,6 @@ class Movies extends Component {
     this.setState({ movies })
 
     const messages = {
-      401: 'You are not authorized to delete movies',
       404: 'The movie has already been deleted',
     }
 
@@ -105,6 +104,7 @@ class Movies extends Component {
       sortColumn,
     } = this.state
 
+    const { user } = this.props
     const filtered = this.getFilteredMovies()
     const sorted = this.getSortedMovies(filtered)
     const movies = paginate(sorted, currentPage, pageSize)
@@ -123,9 +123,11 @@ class Movies extends Component {
             <p className="m-0 align-self-end">
               Showing {filtered.length} movies in the database
             </p>
-            <Link to="/movies/new" className="btn btn-primary ml-auto">
-              New Movie
-            </Link>
+            {user && (
+              <Link to="/movies/new" className="btn btn-primary ml-auto">
+                New Movie
+              </Link>
+            )}
           </div>
           <SearchBox value={searchQuery} onChange={this.handleSearch} />
           <MoviesTable
