@@ -20,11 +20,14 @@ router.post('/', valReq(validate), async (req, res) => {
   await user.save()
 
   const token = user.generateAuthToken()
-  res.header('x-auth-token', token).send({
-    _id: user._id,
-    name: user.name,
-    email: user.email,
-  })
+  res
+    .header('x-auth-token', token)
+    .header('access-control-expose-headers', 'x-auth-token')
+    .send({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+    })
 })
 
 module.exports = router
