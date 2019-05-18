@@ -8,6 +8,7 @@ import { getGenres } from '../services/genreService'
 import { deleteMovie, getMovies } from '../services/movieService'
 import { paginate } from '../utils/paginate'
 import _ from 'lodash'
+import fuzzy from 'fuzzysort'
 
 class Movies extends Component {
   state = {
@@ -33,10 +34,11 @@ class Movies extends Component {
   getFilteredMovies() {
     const { movies, searchQuery, selectedGenre } = this.state
 
-    if (searchQuery)
-      return movies.filter(m =>
-        m.title.toLowerCase().startsWith(searchQuery.toLowerCase())
-      )
+    if (searchQuery) {
+      const opts = { allowTypo: false, key: 'title' }
+      const results = fuzzy.go(searchQuery, movies, opts)
+      return results.map(r => r.obj)
+    }
 
     return selectedGenre && selectedGenre._id
       ? movies.filter(m => m.genre._id === selectedGenre._id)
