@@ -1,20 +1,31 @@
 import React, { Component } from 'react'
 import Joi from 'joi-browser'
+import Checkbox from './Checkbox'
 import Input from './Input'
 import Select from './Select'
 
 class Form extends Component {
   state = { data: {}, errors: {} }
 
-  handleChange = ({ currentTarget: input }) => {
+  getInputErrors = input => {
     const errors = { ...this.state.errors }
     const errorMessage = this.validateProperty(input)
     if (errorMessage) errors[input.name] = errorMessage
     else delete errors[input.name]
 
-    const data = { ...this.state.data }
-    data[input.name] = input.value
+    return errors
+  }
 
+  getInputValue = ({ checked, name, type, value }) => {
+    const data = { ...this.state.data }
+    data[name] = type === 'checkbox' ? checked : value
+
+    return data
+  }
+
+  handleChange = ({ currentTarget: input }) => {
+    const errors = this.getInputErrors(input)
+    const data = this.getInputValue(input)
     this.setState({ data, errors })
   }
 
@@ -26,6 +37,20 @@ class Form extends Component {
     if (errors) return
 
     this.doSubmit()
+  }
+
+  renderCheckbox({ label, name }) {
+    const { data, errors } = this.state
+
+    return (
+      <Checkbox
+        error={errors[name]}
+        label={label}
+        name={name}
+        onChange={this.handleChange}
+        checked={data[name]}
+      />
+    )
   }
 
   renderInput({ label, name, type = 'text' }) {
@@ -76,10 +101,11 @@ class Form extends Component {
     return errors
   }
 
-  validateProperty = ({ name, value }) => {
-    const obj = { [name]: value }
+  validateProperty = ({ checked, name, type, value }) => {
+    const obj = type === 'checkbox' ? { [name]: checked } : { [name]: value }
     const schema = { [name]: this.schema[name] }
     const { error } = Joi.validate(obj, schema)
+
     return error ? error.details[0].message : null
   }
 }
