@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { Redirect, Route, Switch } from 'react-router-dom'
+import CustomerForm from './CustomerForm'
 import Customers from './Customers'
 import LoginForm from './LoginForm'
 import Logout from './Logout'
@@ -28,7 +29,11 @@ class App extends Component {
         <NavBar user={user} />
         <main className="container py-4">
           <Switch>
-            <Route path="/customers" component={Customers} />
+            <ProtectedRoute path="/customers/:id" component={CustomerForm} />
+            <Route
+              path="/customers"
+              render={props => <Customers {...props} user={user} />}
+            />
             <Route path="/login" component={LoginForm} />
             <Route path="/logout" component={Logout} />
             <ProtectedRoute path="/movies/:id" component={MovieForm} />
