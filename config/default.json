@@ -1,5 +1,5 @@
 {
-  "db": "mongodb://localhost/vidly",
+  "db": "",
   "disableAuth": false,
   "jwtPrivateKey": "",
   "port": "3001",
