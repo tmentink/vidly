@@ -10,6 +10,7 @@ import NavBar from './NavBar'
 import ProtectedRoute from './common/ProtectedRoute'
 import NotFound from './NotFound'
 import RegisterForm from './RegisterForm'
+import RentalForm from './RentalForm'
 import Rentals from './Rentals'
 import auth from '../services/authService'
 
@@ -42,7 +43,11 @@ class App extends Component {
               render={props => <Movies {...props} user={user} />}
             />
             <Route path="/register" component={RegisterForm} />
-            <Route path="/rentals" component={Rentals} />
+            <ProtectedRoute path="/rentals/:id" component={RentalForm} />
+            <Route
+              path="/rentals"
+              render={props => <Rentals {...props} user={user} />}
+            />
             <Route path="/not-found" component={NotFound} />
             <Redirect exact from="/" to="/movies" />
             <Redirect to="/not-found" />
