@@ -53,11 +53,12 @@ class Form extends Component {
     )
   }
 
-  renderInput({ label, name, type = 'text' }) {
+  renderInput({ label, name, type = 'text', ...rest }) {
     const { data, errors } = this.state
 
     return (
       <Input
+        {...rest}
         error={errors[name]}
         label={label}
         name={name}
@@ -75,11 +76,13 @@ class Form extends Component {
     placeholder = 'Select one',
     textProperty = 'name',
     valueProperty = '_id',
+    ...rest
   }) {
     const { data, errors } = this.state
 
     return (
       <Select
+        {...rest}
         error={errors[name]}
         label={label}
         name={name}
