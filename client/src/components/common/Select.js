@@ -1,6 +1,15 @@
 import React from 'react'
 
-const Select = ({ error, label, name, options, ...rest }) => {
+const Select = ({
+  error,
+  label,
+  name,
+  options,
+  placeholder,
+  textProperty,
+  valueProperty,
+  ...rest
+}) => {
   const invalid = error != null ? 'is-invalid' : ''
 
   return (
@@ -12,9 +21,10 @@ const Select = ({ error, label, name, options, ...rest }) => {
         id={name}
         name={name}
       >
+        <option value="">{placeholder}</option>
         {options.map(opt => (
-          <option key={opt._id} value={opt._id}>
-            {opt.name}
+          <option key={opt._id} value={opt[valueProperty]}>
+            {opt[textProperty]}
           </option>
         ))}
       </select>

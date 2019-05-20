@@ -68,7 +68,14 @@ class Form extends Component {
     )
   }
 
-  renderSelect({ label, name, options }) {
+  renderSelect({
+    label,
+    name,
+    options,
+    placeholder = 'Select one',
+    textProperty = 'name',
+    valueProperty = '_id',
+  }) {
     const { data, errors } = this.state
 
     return (
@@ -78,7 +85,10 @@ class Form extends Component {
         name={name}
         onChange={this.handleChange}
         options={options}
+        placeholder={placeholder}
+        textProperty={textProperty}
         value={data[name]}
+        valueProperty={valueProperty}
       />
     )
   }
