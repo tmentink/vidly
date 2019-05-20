@@ -4,11 +4,16 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "concurrently \"npm run server\" \"npm run client\"",
-    "server": "nodemon server.js",
     "client": "node start-client.js",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "heroku-postbuild": "cd client/ && npm install && npm install --only=dev --no-shrinkwrap && npm run build",
+    "server": "nodemon server.js",
+    "start": "node server.js",
     "test": "jest --watch --verbose --runInBand tests/",
     "test-coverage": "jest --coverage --runInBand tests/"
+  },
+  "engines": {
+    "node": "11.11.0"
   },
   "keywords": [],
   "author": "Trent Mentink",
